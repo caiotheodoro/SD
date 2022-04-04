@@ -39,5 +39,5 @@ receiveThread.start()
 #Send data to server
 #str.encode is used to turn the string message into bytes so it can be sent across the network
 while True:
-    message = input("Mensagem: ")
+    message = input()
     sock.sendall('M'.encode("utf-8") + str.encode(message))

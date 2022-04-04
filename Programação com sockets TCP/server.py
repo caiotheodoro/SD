@@ -60,14 +60,14 @@ class Client(threading.Thread):
                 print("ID " + str(self.user) + ": " + str(data[1:]))
                 for client in connections:
                     if client.id != self.id:
-                        client.socket.sendall(data[1:].encode("utf-8"))
+                        client.socket.sendall((self.user + ":" + data[1:]).encode("utf-8"))
               elif data[0] == 'L':
                   print("entrou")
                   if self.verifyLogin(data[1:]):
                     print("ID " + str(self.user) + ": " + str(data[1:]))
-                    self.socket.sendall("Login successful".encode("utf-8"))
+                    self.socket.sendall("Server: Login successful\n".encode("utf-8"))
                   else:
-                    self.socket.sendall("Login failed".encode("utf-8"))
+                    self.socket.sendall("Server: Login failed\n".encode("utf-8"))
                     connections.remove(self)
                     self.signal = False
                     break
