@@ -28,15 +28,15 @@ class Client(threading.Thread):
     #.decode is used to convert the byte data into a printable string
     def verifyLogin(self, data):
       #verify if data is on accounts.txt
-      login = data.split(';')[0]
-      senha = data.split(';')[1]
+      login = data.split(',')[0]
+      senha = data.split(',')[1]
       try:
         with open('accounts.txt', 'r') as file:
           for line in file:
-            if login in line.split(';')[0]:
+            if login in line.split(',')[0]:
               #compare hashes
-              #if hashlib.sha512( str( line.split(';')[1] ).encode("utf-8")).hexdigest() == senha:
-              if senha == line.split(';')[1][:-1]:
+              #if hashlib.sha512( str( line.split(';')[1][:-1] ).encode("utf-8")).hexdigest() == senha:
+              if senha == line.split(',')[1][:-1]:
                 self.user = login
                 return True
       except:
@@ -47,30 +47,28 @@ class Client(threading.Thread):
     def run(self):
         while self.signal:
             try:
-                data = self.socket.recv(32)
+                data = self.socket.recv(1024)
             except:
                 print("Client " + str(self.address) + " has disconnected")
                 self.signal = False
                 connections.remove(self)
                 break
             if data != "":
+
               data = data.decode("utf-8")
-              if data[0] == 'M':
-                
+              operation = data.split(' ')[0]
+              data = data.split(' ')[1]
+              print(data)
+              if operation == 'PWD':
                 print("ID " + str(self.user) + ": " + str(data[1:]))
                 for client in connections:
                     if client.id != self.id:
                         client.socket.sendall((self.user + ":" + data[1:]).encode("utf-8"))
-              elif data[0] == 'L':
-                  print("entrou")
-                  if self.verifyLogin(data[1:]):
-                    print("ID " + str(self.user) + ": " + str(data[1:]))
-                    self.socket.sendall("Server: Login successful\n".encode("utf-8"))
+              elif operation == 'CONNECT':
+                  if self.verifyLogin(data):
+                    self.socket.send("SUCCESS\n".encode("utf-8"))
                   else:
-                    self.socket.sendall("Server: Login failed\n".encode("utf-8"))
-                    connections.remove(self)
-                    self.signal = False
-                    break
+                    self.socket.send("ERROR\n".encode("utf-8"))
 
 #Wait for new connections
 def newConnections(socket):
