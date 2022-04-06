@@ -1,3 +1,22 @@
+'''
+    # Descrição: Questão 1) - Faça um servidor para processar as seguintes mensagens dos clientes. O servidor deve suportar mensagens
+    de múltiplos clientes. Use o TCP. As mensagens de solicitação estão no formato String UTF
+
+    # Login
+    Inserir login e senha para acesso o servidor. Enviado com flag CONNECT login,password.
+
+    # Mensagens de solicitação:
+    #    PWD: path atual
+    #    CHDIR <path>: mudar para o diretório <path>
+    #    GETDIRS: listar diretórios
+    #    GETFILES: listar arquivos
+    #    EXIT: Finalizar conexao
+
+    # Autores: Caio Theodoro e Gustavo Kioshi
+    # Data de criação: 02/04/2022
+    # Data de modificação: 06/04/2022
+'''
+
 import socket #socket lib
 import threading #thread lib
 import sys #lib para processos e sistema
