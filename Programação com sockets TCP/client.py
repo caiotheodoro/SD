@@ -1,22 +1,19 @@
-import socket
-import threading
-import sys
-import hashlib
-#Wait for incoming data from server
-#.decode is used to turn the message in bytes to a string
-isConnected = False
+import socket #socket lib
+import threading #thread lib
+import sys #lib para processos e sistema
+import hashlib #lib para hash
+isConnected = False #variavel para verificar se o cliente esta conectado
 
-def receive(socket, signal):
-    while signal:
-        try:
-            data = socket.recv(1024)
-            print(str(data.decode("utf-8")))
-            response = data.decode("utf-8")
-            if response[:-1] == "SUCCESS":
-                isConnected = True
-            else:
-                signal = False
-                sys.exit()
+def receive(socket, signal):    #recebe mensagens do servidor
+    while signal: #enquanto o cliente estiver conectado
+        try: #tenta receber mensagem
+            data = socket.recv(1024) #recebe mensagem
+            print(str(data.decode("utf-8"))) #imprime mensagem
+            response = data.decode("utf-8") 
+            if response[:-1] == "ERROR": #se a mensagem for de erro
+                signal = False #desconecta o cliente
+                socket.close() #fecha conexao
+                sys.exit(0) #sai do programa
 
         except:
             print("You have been disconnected from the server")
@@ -25,33 +22,23 @@ def receive(socket, signal):
 
 
 #registra login e senha
-
-
-#senha = hashlib.sha512( str( senha ).encode("utf-8")).hexdigest()
 login = input("Login: ")
 senha = input("Senha: ")
-#senhaHash = hashlib.sha512(senha.encode('utf-8')).hexdigest()
 try:
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect(('localhost', 3333))
-    senhaCriptografada = hashlib.sha512(senha.encode('utf-8')).hexdigest()
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #cria socket
+    sock.connect(('localhost', 3333)) #conecta ao servidor
+    senhaCriptografada = hashlib.sha512(senha.encode('utf-8')).hexdigest() #criptografa a senha
     print(senhaCriptografada)
+    sock.send(('CONNECT '+ str(login) + ',' + str(senhaCriptografada)).encode("utf-8")) #envia mensagem de login
 
-    sock.send(('CONNECT '+ str(login) + ',' + str(senhaCriptografada)).encode("utf-8"))
-
-    #cripeando a senha
-    #send login senha to server
 except:
-    print("Could not make a connection to the server")
-    input("Press enter to quit")
+    print("Não foi possível se conectar ao servidor")
+    input("Pressione ENTER para sair")
     sys.exit(0)
 
-#Create new thread to wait for data
-receiveThread = threading.Thread(target = receive, args = (sock, True))
-receiveThread.start()
+receiveThread = threading.Thread(target = receive, args = (sock, True)) #cria thread para receber mensagens
+receiveThread.start() #inicia thread
 
-#Send data to server
-#str.encode is used to turn the string message into bytes so it can be sent across the network
 while True:
-    message = input("~")
-    sock.sendall('M'.encode("utf-8") + str.encode(message))
+    message = input("~") #recebe mensagem do cliente
+    sock.sendall(str.encode(message)) #envia mensagem para o servidor
