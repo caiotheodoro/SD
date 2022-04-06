@@ -20,10 +20,10 @@ Exemplo de uso
 -Para acessar um outro arquivo.
 # CHDIR a
 
--Mostrar mostrar todos os arquivos nesse diretório.
+-Mostrar todos os arquivos nesse diretório e mostrar a quatidade.
 # GETFILES
 
--Mostrar todos os diretórios nesse diretório
+-Mostrar todos os diretórios nesse diretório e mostrar a quatidade.
 # GETDIRS
 
 -Para finalizar a conexão
