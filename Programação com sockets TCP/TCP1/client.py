@@ -21,7 +21,6 @@ import socket #socket lib
 import threading #thread lib
 import sys #lib para processos e sistema
 import hashlib #lib para hash
-isConnected = False #variavel para verificar se o cliente esta conectado
 
 def receive(socket, signal):    #recebe mensagens do servidor
     while signal: #enquanto o cliente estiver conectado
@@ -41,15 +40,10 @@ def receive(socket, signal):    #recebe mensagens do servidor
 
 
 #registra login e senha
-login = input("Login: ")
-senha = input("Senha: ")
 try:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #cria socket
     sock.connect(('localhost', 3333)) #conecta ao servidor
-    senhaCriptografada = hashlib.sha512(senha.encode('utf-8')).hexdigest() #criptografa a senha
-    print(senhaCriptografada)
-    sock.send(('CONNECT '+ str(login) + ',' + str(senhaCriptografada)).encode("utf-8")) #envia mensagem de login
-
+    isConnected = False
 except:
     print("Não foi possível se conectar ao servidor")
     input("Pressione ENTER para sair")
@@ -60,4 +54,11 @@ receiveThread.start() #inicia thread
 
 while True:
     message = input("~") #recebe mensagem do cliente
-    sock.sendall(str.encode(message)) #envia mensagem para o servidor
+    print()
+    if message.split(' ')[0] == 'CONNECT' and not isConnected:
+        data = message.split(' ')[1]
+        senhaCriptografada = hashlib.sha512(data.split(",")[1].encode('utf-8')).hexdigest() #criptografa a senha
+        sock.send(('CONNECT '+ str(data.split(",")[0]) + ',' + str(senhaCriptografada)).encode("utf-8")) #envia mensagem de login
+
+    else: 
+        sock.sendall(str.encode(message)) #envia mensagem para o servidor

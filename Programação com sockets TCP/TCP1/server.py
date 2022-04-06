@@ -32,6 +32,7 @@ class Client(threading.Thread):
         self.id = id
         self.user = ''
         self.name = name
+        self.isConnected = False
         self.signal = signal
     
     def __str__(self): #retorna o nome do cliente
@@ -66,7 +67,7 @@ class Client(threading.Thread):
 
               data = data.decode("utf-8") #decodifica a mensagem
               operation = data.split(' ')[0] #separa a operacao da mensagem
-
+        
               if operation == "EXIT": #se a operacao for EXIT
                     print("ID " + str(self.user) + ": Request - " + str(operation) + "-  Response - Success") #log de operacao
                     self.signal = False #desconecta o cliente
@@ -74,6 +75,9 @@ class Client(threading.Thread):
                     connections.remove(self) #remove o cliente da lista de conexoes
                     break
               elif operation == 'PWD':  #se a operacao for PWD
+                if not self.isConnected:
+                  self.socket.send(("Você deve se autenticar primeiro! use CONNECT login,senha\n").encode("utf-8")) #envia mensagem para o cliente
+                  break 
                 pathAtual: os.PathLike = os.getcwd() #pega o caminho atual
                 print("ID " + str(self.user) + ": Request - " + str(operation) + "-  Response - " + pathAtual)#log de operacao
                 self.socket.send((pathAtual).encode("utf-8")) #envia mensagem para o cliente
@@ -83,11 +87,15 @@ class Client(threading.Thread):
                   if self.verifyLogin(data): #verifica se o usuario existe
                     print("ID " + str(self.user) + ": Request - " + str(operation) + "-  Response - Success") #log de operacao
                     self.socket.send("SUCCESS\n".encode("utf-8")) 
+                    self.isConnected = True
                   else:
                     print("ID " + str(self.user) + ": Request - " + str(operation) + "-  Response - Failed") #log de operacao
                     self.socket.send("ERROR\n".encode("utf-8"))
 
               elif operation == "CHDIR": #se a operacao for CHDIR
+                if not self.isConnected:
+                  self.socket.send(("Você deve se autenticar primeiro! use CONNECT login,senha\n").encode("utf-8")) #envia mensagem para o cliente
+                  break 
                   data = data.split(' ')[1] #caminho
                   if os.path.isdir(data): #se o caminho existir
                     os.chdir(data) #muda o caminho
@@ -97,28 +105,35 @@ class Client(threading.Thread):
                     print("ID " + str(self.user) + ": Request - " + str(operation) + "-  Response - Failed") #log de operacao
                     self.socket.send("ERROR\n".encode("utf-8"))
               elif operation == "GETFILES" or "GETDIRS":
-                   files = []
-                   dirs = []
+                if not self.isConnected:
+                  self.socket.send(("Você deve se autenticar primeiro! use CONNECT login,senha\n").encode("utf-8")) #envia mensagem para o cliente
+                  break 
+
+                  files = []
+                  dirs = []
                      
-                   dir = os.getcwd()
-                   allFiles = os.listdir(dir)
-                   for file in allFiles:
-                       if os.path.isfile(file): #se for um arquivo
-                            files.append(file) #adiciona a lista de arquivos
-                       if os.path.isdir(file): #se for um diretorio
-                            dirs.append(file) #adiciona a lista de diretorios
+                  dir = os.getcwd()
+                  allFiles = os.listdir(dir)
+                  for file in allFiles:
+                    if os.path.isfile(file): #se for um arquivo
+                      files.append(file) #adiciona a lista de arquivos
+                    if os.path.isdir(file): #se for um diretorio
+                      dirs.append(file) #adiciona a lista de diretorios
 
-                   numFiles = len(files) #numero de arquivos
-                   numDirs = len(dirs) #numero de diretorios
+                  numFiles = len(files) #numero de arquivos
+                  numDirs = len(dirs) #numero de diretorios
 
-                   if operation == "GETFILES":
+                  if operation == "GETFILES":
                         print("ID " + str(self.user) + ": Request - " + str(operation) + "-  Response - " + str(numFiles)) #log de operacao
                         self.socket.send(("Numero de arquivos: " + str(numFiles) + "\n" + "\n".join(files)  ).encode("utf-8")) 
-                   elif operation == "GETDIRS":
+                  elif operation == "GETDIRS":
                         print("ID " + str(self.user) + ": Request - " + str(operation) + "-  Response - " + str(numDirs)) #log de operacao
                         self.socket.send(("Numero de diretórios: " + str(numDirs) + "\n" + "\n".join(dirs)  ).encode("utf-8")) 
               
               else:
+                if not self.isConnected:
+                  self.socket.send(("Você deve se autenticar primeiro! use CONNECT login,senha\n").encode("utf-8")) #envia mensagem para o cliente
+                  break 
                   for client in connections: #para cada cliente conectado
                     print("ID " + str(self.user) + ": Request - Message -  Response - :" + data)
                     if client.id != self.id : #se o cliente nao for o proprio
