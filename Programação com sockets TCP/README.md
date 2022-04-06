@@ -20,24 +20,24 @@ python3 ./server.py
 python3 ./client.py
 ```
 
-Login: campiolo
-Senha: so
+# Login: campiolo 
+# Senha: so
 
-# ~PWD
+## ~PWD
 ~/Documents/Socket/
 
-# ~GETDIRS
+## ~GETDIRS
 ~Numero de diretórios: 2
 a
 b
 
-# ~CHDIR a
+## ~CHDIR a
 ~SUCCESS
 
-# ~PWD
+## ~PWD
 ~/Documents/Socket/a
 
-# ~GETFILES
+## ~GETFILES
 ~Numero de arquivos: 5
 accounts.txt
 Atividade 01 - TCP - v2.pdf
