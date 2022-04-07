@@ -12,6 +12,10 @@
     #    GETFILES: listar arquivos
     #    EXIT: Finalizar conexao
 
+
+    # Usuários para teste: caio,teste ;  gustavo;teste4  ; campiolo;so
+    #
+
     # Autores: Caio Theodoro e Gustavo Kioshi
     # Data de criação: 02/04/2022
     # Data de modificação: 06/04/2022
@@ -67,35 +71,33 @@ class Client(threading.Thread):
 
               data = data.decode("utf-8") #decodifica a mensagem
               operation = data.split(' ')[0] #separa a operacao da mensagem
-        
-              if operation == "EXIT": #se a operacao for EXIT
+              if not self.isConnected and operation == "CONNECT":
+                data = data.split(' ')[1] #login;senha
+                if self.verifyLogin(data): #verifica se o usuario existe
+                  print("ID " + str(self.user) + ": Request - " + str(operation) + "-  Response - Success") #log de operacao
+                  self.socket.send("SUCCESS\n".encode("utf-8")) 
+                  self.isConnected = True
+                else:
+                  print("ID " + str(self.user) + ": Request - " + str(operation) + "-  Response - Failed") #log de operacao
+                  self.socket.send("ERROR\n".encode("utf-8"))
+                  
+              elif not self.isConnected:
+                self.socket.send(("Você deve se autenticar primeiro! use CONNECT login,senha\n").encode("utf-8")) #envia mensagem para o cliente
+              
+              elif operation == "EXIT": #se a operacao for EXIT
                     print("ID " + str(self.user) + ": Request - " + str(operation) + "-  Response - Success") #log de operacao
                     self.signal = False #desconecta o cliente
                     self.socket.send("SESSAO FINALIZADA\n".encode("utf-8")) #envia mensagem para o cliente
                     connections.remove(self) #remove o cliente da lista de conexoes
                     break
+              
               elif operation == 'PWD':  #se a operacao for PWD
-                if not self.isConnected:
-                  self.socket.send(("Você deve se autenticar primeiro! use CONNECT login,senha\n").encode("utf-8")) #envia mensagem para o cliente
-                  break 
                 pathAtual: os.PathLike = os.getcwd() #pega o caminho atual
                 print("ID " + str(self.user) + ": Request - " + str(operation) + "-  Response - " + pathAtual)#log de operacao
                 self.socket.send((pathAtual).encode("utf-8")) #envia mensagem para o cliente
             
-              elif operation == 'CONNECT': #se a operacao for CONNECT
-                  data = data.split(' ')[1] #login;senha
-                  if self.verifyLogin(data): #verifica se o usuario existe
-                    print("ID " + str(self.user) + ": Request - " + str(operation) + "-  Response - Success") #log de operacao
-                    self.socket.send("SUCCESS\n".encode("utf-8")) 
-                    self.isConnected = True
-                  else:
-                    print("ID " + str(self.user) + ": Request - " + str(operation) + "-  Response - Failed") #log de operacao
-                    self.socket.send("ERROR\n".encode("utf-8"))
 
               elif operation == "CHDIR": #se a operacao for CHDIR
-                if not self.isConnected:
-                  self.socket.send(("Você deve se autenticar primeiro! use CONNECT login,senha\n").encode("utf-8")) #envia mensagem para o cliente
-                  break 
                   data = data.split(' ')[1] #caminho
                   if os.path.isdir(data): #se o caminho existir
                     os.chdir(data) #muda o caminho
@@ -105,9 +107,6 @@ class Client(threading.Thread):
                     print("ID " + str(self.user) + ": Request - " + str(operation) + "-  Response - Failed") #log de operacao
                     self.socket.send("ERROR\n".encode("utf-8"))
               elif operation == "GETFILES" or "GETDIRS":
-                if not self.isConnected:
-                  self.socket.send(("Você deve se autenticar primeiro! use CONNECT login,senha\n").encode("utf-8")) #envia mensagem para o cliente
-                  break 
 
                   files = []
                   dirs = []
@@ -131,13 +130,7 @@ class Client(threading.Thread):
                         self.socket.send(("Numero de diretórios: " + str(numDirs) + "\n" + "\n".join(dirs)  ).encode("utf-8")) 
               
               else:
-                if not self.isConnected:
-                  self.socket.send(("Você deve se autenticar primeiro! use CONNECT login,senha\n").encode("utf-8")) #envia mensagem para o cliente
-                  break 
-                  for client in connections: #para cada cliente conectado
-                    print("ID " + str(self.user) + ": Request - Message -  Response - :" + data)
-                    if client.id != self.id : #se o cliente nao for o proprio
-                        client.socket.sendall((self.user + ":" + data).encode("utf-8")) #envia mensagem para o cliente
+                self.socket.send(("Comando inválido.").encode("utf-8")) 
 
 def newConnections(socket):  #cria novas conexoes
     while True:
