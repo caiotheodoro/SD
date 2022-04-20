@@ -1,28 +1,32 @@
+'''
+    # Descrição: Fazer um chat P2P que possibilite os clientes trocarem mensagens entre si. 
+As mensagens possuem o formato: 
+- tipo de mensagem [1 byte]
+- tamanho apelido (tam_apl) [1 byte]
+- apelido [tam_apl (1 a 64) bytes ] 
+- tamanho mensagem (tam_msg) [1 byte]
+- mensagem [tam_msg bytes]
+
+
+- tipo de mensagem:
+    1: mensagem normal
+    2: emoji
+    3: URL
+    4: ECHO (envia e recebe a mesma mensagem para indicar que usuário está ativo
+
+    # Autores: Caio Theodoro e Gustavo Kioshi
+    # Data de criação: 17/04/2022
+    # Data de modificação: 19/04/2022
+'''
+
+from emojis import emojis
 from threading import Thread
 import sys
 import socket
 
 ip = "127.0.0.1"
 address = [5761, 5762, 3000]
-emojis = [
-    ':-)',
-    ':-D',
-    ':-P',
-    ':-O',
-    ':-/',
-    ':-(',
-    ':-X',
-    ':-|',
-    ':->',
-    ';-)',
-    ';-D',
-    ';-P',
-    ';-O',
-    ';-/',
-    ';-(',
-    ';-X',
-    ';-|',
-] # lista de emojis
+
 
 
 def receptor(player, adr):
