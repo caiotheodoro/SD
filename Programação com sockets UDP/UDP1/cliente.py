@@ -5,7 +5,7 @@ As mensagens possuem o formato:
 - tamanho apelido (tam_apl) [1 byte]
 - apelido [tam_apl (1 a 64) bytes ] 
 - tamanho mensagem (tam_msg) [1 byte]
-- mensagem [tam_msg bytes]
+- mensagem [tam_msg bytes] [0-255 byte]
 
 
 - tipo de mensagem:
@@ -25,14 +25,14 @@ import sys
 import socket
 
 ip = "127.0.0.1"
-address = [5761, 5762, 3000]
+address = [5761, 5762]
 
 
 
 def receptor(player, adr):
     s.bind((ip, int(adr))) # binda o socket ao ip e a porta
     while True: 
-        msg, addr = s.recvfrom(1024) # recebe uma mensagem
+        msg, addr = s.recvfrom(322) # recebe uma mensagem no tamanho maximo que a mensagem pode ser enviada 1+1+1+64+255=322
         tipo = int(msg[0]) # pega o tipo da mensagem
         tamPlayer = int(msg[1]) # pega o tamanho do player
         player = msg[2:2+tamPlayer].decode("utf-8") # pega o player
