@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+message Curso {
+    string codigo = 1;
+    string nome = 2;
+}
+
+message Cursos {
+    repeated Curso cursos = 1;
+}
