@@ -2,6 +2,16 @@
 
 <html lang="en" dir="ltr">
 
+
+<?php
+
+require_once "../vendor/autoload.php";
+
+use App\Proto\CrudMatricula;
+use App\Proto\Matricula;
+
+?>
+
 <head>
   <meta charset="UTF-8">
 
@@ -13,10 +23,24 @@
 
 <body>
   <?php
-  $db = new SQLite3('database.db');
-  ?>
+  //use Matricula protocol buffer
 
-  <section style="margin-bottom: 50px; margin-top: 50px;">
+  $host = "127.0.0.1";
+  $port = 20205;
+  $sock = socket_create(AF_INET, SOCK_STREAM, 0);
+  socket_connect($sock, $host, $port);
+  $db = new SQLite3('database.db');
+  $editRa;
+  $editCodDisciplina;
+
+  $matricula = new Matricula();
+  $crudMatricula = new CrudMatricula();
+  
+
+  ?>
+<div style="display: flex; width: 100%; margin-top: 30px; ">
+  <section style=" width: 50%;">
+  
     <div id="myModal" class="modal modalMatricula">
       <div class="modal-content">
         <span class="close" onclick="fecharModalMatricula()">&times;</span>
@@ -32,12 +56,21 @@
         </form>
         <?php
         if (isset($_POST['submit'])) {
-          $ra = $_POST['ra'];
-          $cod_disciplina = $_POST['cod_disciplina'];
-          $ano = $_POST['ano'];
-          $semestre = $_POST['semestre'];
-          $SQL = "INSERT INTO matricula (ra, cod_disciplina, ano,semestre,nota,faltas) VALUES (" . $ra . ",'" . $cod_disciplina . "'," . $ano . "," . $semestre . ",0,0)";
-          $result = $db->query($SQL);
+
+          $matricula->setRA($_POST['ra']);
+          $matricula->setSemestre($_POST['semestre']);
+          $matricula->setCodDisciplina($_POST['cod_disciplina']);
+          $matricula->setAno($_POST['ano']);
+
+          $crudMatricula->setMatricula($matricula);
+          $crudMatricula->setType(1);
+
+          $matricula_string = $crudMatricula->serializeToJsonString();
+          $len = strlen($matricula_string);
+          socket_write($sock, $matricula_string, $len);
+
+          $serv = socket_read($sock, 1024);
+          echo "Server: \t" . trim($serv);
         }
         ?>
       </div>
@@ -113,9 +146,80 @@
         ?>
       </div>
     </div>
+    <div id="myModal5" class="modal modalEditNotas">
+      <div class="modal-content">
+        <span class="close" onclick="fecharModalNotas()">&times;</span>
+        <form method="post">
+          <div style="justify-content: space-between; display:flex; flex-direction: column; height: 250px;">
+            <h1>Editar Nota</h1>
+            <input id="raEditNota" type="number" name="ra" placeholder="RA" value="" />
+            <input id="codDisciplinaEditNota" type="text" name="cod_disciplina" placeholder="Codigo_disciplina" value="" />
+            <input type="number" name="nota" placeholder="Nota" />
+            <input type="submit" name="submitEditNota" value="submit" />
+          </div>
+        </form>
+        <?php
+        if (isset($_POST['submitEditNota'])) {
+       
+       
+          $matricula->setNota($_POST['nota']);
+          $matricula->setRA($_POST['ra']);
+          $matricula->setCodDisciplina($_POST['cod_disciplina']);
+          $crudMatricula->setMatricula($matricula);
+          $crudMatricula->setType(2);
+
+          
+          $matricula_string = $crudMatricula->serializeToJsonString();
+          $len = strlen($matricula_string);
+          socket_write($sock, $matricula_string, $len);
+
+          $serv = socket_read($sock, 1024);
+          echo "Server: \t" . trim($serv);
+
+          $matricula->setRA(0);
+          $matricula->setCodDisciplina(0);
+
+        }
+        ?>
+      </div>
+    </div>
+    <div id="myModal6" class="modal modalEditFaltas">
+      <div class="modal-content">
+        <span class="close" onclick="fecharModalFaltas()">&times;</span>
+        <form method="post">
+          <div style="justify-content: space-between; display:flex; flex-direction: column; height: 250px;">
+            <h1>Editar Faltas</h1>
+            <input id="raEditFalta" type="number" name="ra" placeholder="RA" value="" />
+            <input id="codDisciplinaEditFalta" type="text" name="cod_disciplina" placeholder="Codigo_disciplina" value="" />
+            <input type="number" name="faltas" placeholder="Faltas" />
+            <input type="submit" name="submitEditFalta" value="submit" />
+          </div>
+        </form>
+        <?php
+        if (isset($_POST['submitEditFalta'])) {
+       
+       
+          $matricula->setFaltas($_POST['faltas']);
+          $matricula->setRA($_POST['ra']);
+          $matricula->setCodDisciplina($_POST['cod_disciplina']);
+          $crudMatricula->setMatricula($matricula);
+          $crudMatricula->setType(3);
+
+          
+          $matricula_string = $crudMatricula->serializeToJsonString();
+          $len = strlen($matricula_string);
+          socket_write($sock, $matricula_string, $len);
+
+          $serv = socket_read($sock, 1024);
+          echo "Server: \t" . trim($serv);
+
+          $matricula->setRA(0);
+          $matricula->setCodDisciplina(0);
+        }
+        ?>
+      </div>
+    </div>
     <div class="home-content">
-
-
       <div class="sales-boxes">
         <div class="recent-sales box" style=" background-color: #52784F;">
           <div style="
@@ -125,8 +229,13 @@
             margin-bottom: 30px;
           ">
             <div class="title">Matriculas</div>
-            <div class="button" id="myBtn">
-              <a onclick="abrirModalMatricula()">Adicionar</a>
+            <div style="display: flex; ">
+              <div class="button" id="myBtn" style="margin-right: 10px;">
+                <a onclick="abrirModalMatricula()">Listar</a>
+              </div>
+              <div class="button" id="myBtn">
+                <a onclick="abrirModalMatricula()">Adicionar</a>
+              </div>
             </div>
           </div>
           <div class="sales-details">
@@ -137,7 +246,7 @@
 
             <ul class="details">
 
-              <li class="topic">RA</li>
+              <li class="topic"><a href="#">RA</a></li>
               <?php
               while ($row = $result->fetchArray()) {
                 echo '<li ><a href="#">' . $row['ra'] . '</li>';
@@ -145,15 +254,16 @@
               ?>
             </ul>
             <ul class="details">
-              <li class="topic">Código disciplina</li>
+              <li class="topic"><a href="#"> Código disciplina</a></li>
               <?php
               while ($row = $result->fetchArray()) {
                 echo '<li ><a href="#">' . $row['cod_disciplina'] . '</li>';
               }
               ?>
+              
             </ul>
             <ul class="details">
-              <li class="topic">Ano</li>
+              <li class="topic"><a href="#">Ano</a></li>
               <?php
               while ($row = $result->fetchArray()) {
                 echo '<li ><a href="#">' . $row['ano'] . '</a></li>';
@@ -184,6 +294,22 @@
               }
               ?>
             </ul>
+            <ul class="details">
+              <li class="topic">Editar nota</li>
+              <?php
+              while ($row = $result->fetchArray()) {
+                echo '<li><button id='. $row['ra'] . ',' . $row['cod_disciplina'] .' onclick="javascript:abrirModalEditNotas(this.id)">Editar</button></li>';
+              }
+              ?>
+            </ul>
+            <ul class="details">
+              <li class="topic">Editar faltas</li>
+              <?php
+              while ($row = $result->fetchArray()) {
+                echo '<li><button id='. $row['ra'] . ',' . $row['cod_disciplina'] .' onclick="javascript:abrirModalEditFaltas(this.id)">Editar</button></li>';
+              }
+              ?>
+            </ul>
           </div>
 
         </div>
@@ -192,7 +318,7 @@
     </div>
 
   </section>
-  <section style="margin-bottom: 50px;">
+  <section style=" width: 50%">
 
     <div class="home-content">
 
@@ -206,8 +332,14 @@
             margin-bottom: 30px;
           ">
             <div class="title">Alunos</div>
-            <div class="button" id="myBtn">
+            
+            <div style="display: flex; ">
+              <div class="button" id="myBtn" style="margin-right: 10px;">
+                <a onclick="abrirModalMatricula()">Listar</a>
+              </div>
+              <div class="button" id="myBtn">
               <a onclick="abrirModalAluno()">Adicionar</a>
+            </div>
             </div>
           </div>
           <div class="sales-details">
@@ -254,7 +386,9 @@
     </div>
 
   </section>
-  <section style="margin-bottom: 50px;">
+</div>
+<div style="display: flex; width: 100%; margin-top: 30px;margin-bottom: 30px;">
+  <section style="width: 50%">
 
     <div class="home-content">
 
@@ -268,9 +402,16 @@
             margin-bottom: 30px;
           ">
             <div class="title">Disciplinas</div>
-            <div class="button" id="myBtn">
+            
+            <div style="display: flex; ">
+              <div class="button" id="myBtn" style="margin-right: 10px;">
+                <a onclick="abrirModalMatricula()">Listar</a>
+              </div>
+              <div class="button" id="myBtn">
               <a onclick="abrirModalDisciplinas()">Adicionar</a>
             </div>
+            </div>
+            
           </div>
           <div class="sales-details">
             <?php
@@ -317,7 +458,7 @@
     </div>
 
   </section>
-  <section style="margin-bottom: 50px;">
+  <section style=" width: 50%">
 
     <div class="home-content">
 
@@ -365,12 +506,17 @@
     </div>
 
   </section>
+</div>
 
   <script>
     let modalMatricula = document.querySelector(".modalMatricula");
     let modalAluno = document.querySelector(".modalAluno");
     let modalDisciplina = document.querySelector(".modalDisciplina");
     let modalCurso = document.querySelector(".modalCurso");
+    let modalNota = document.querySelector(".modalEditNotas");
+    let modalFalta = document.querySelector(".modalEditFaltas");
+
+ 
     // Get the modal
     function abrirModalMatricula() {
       modalMatricula.style.display = "block";
@@ -404,13 +550,31 @@
       modalCurso.style.display = "none";
     }
 
+   
 
-    // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function(event) {
-      if (event.target == modal) {
-        modal.style.display = "none";
-      }
+    function abrirModalEditNotas(id) {
+      console.log(id)
+      document.getElementById("raEditNota").value = id.split(",")[0];
+      document.getElementById("codDisciplinaEditNota").value = id.split(",")[1];
+      modalNota.style.display = "block";
     }
+
+    function fecharModalNotas() {
+      modalNota.style.display = "none";
+    }
+
+    function abrirModalEditFaltas(id) {
+      document.getElementById("raEditFalta").value = id.split(",")[0];
+      document.getElementById("codDisciplinaEditFalta").value = id.split(",")[1];
+      modalFalta.style.display = "block";
+    }
+
+    function fecharModalFaltas() {
+      modalFalta.style.display = "none";
+    }
+
+
+   
   </script>
 
 </body>

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option php_namespace= "App\\Proto";
+option php_metadata_namespace = "App\\Proto\\GPBMetadata";
+
+message Disciplina {
+    string codigo = 1;
+    string nome = 2;
+    string professor = 3;
+    int32 cod_curso = 4;
+}
+
+message CrudDisciplina {
+    int32 type = 1;
+    Disciplina disciplina = 2;
+}

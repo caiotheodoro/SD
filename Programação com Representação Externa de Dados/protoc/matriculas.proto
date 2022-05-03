@@ -1,5 +1,8 @@
 syntax = "proto3";
 
+option php_namespace= "App\\Proto";
+option php_metadata_namespace = "App\\Proto\\GPBMetadata";
+
 message Matricula {
     int32 RA = 1;
     string cod_disciplina = 2;
@@ -9,6 +12,9 @@ message Matricula {
     int32 faltas = 6;
 }
 
-message Matriculas {
-    repeated Matricula matriculas = 1;
+
+message CrudMatricula {
+    int32 type = 1;
+    Matricula matricula = 2;
 }
+

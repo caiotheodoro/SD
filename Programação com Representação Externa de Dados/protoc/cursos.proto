@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option php_namespace= "App\\Proto";
+option php_metadata_namespace = "App\\Proto\\GPBMetadata";
+
+message Curso {
+    string codigo = 1;
+    string nome = 2;
+}
+
+message CrudCurso {
+    int32 type = 1;
+    Curso curso = 2;
+}
