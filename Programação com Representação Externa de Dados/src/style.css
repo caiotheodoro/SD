@@ -245,6 +245,7 @@ nav .profile-details i {
     overflow-y: scroll;
     overflow-x: hidden;
     width: 100%;
+    padding-right: 50px;
 }
 
 .sales-boxes .box .title {
@@ -271,7 +272,6 @@ nav .profile-details i {
 }
 
 .sales-boxes .box .button {
-    width: 100%;
     display: flex;
     justify-content: flex-end;
 }
