@@ -13,23 +13,23 @@ use App\Proto\Matricula;
 </head>
 <body>
   <?php
-  $host = "127.0.0.1";
-  $port = 20205;
-  $sock = socket_create(AF_INET, SOCK_STREAM, 0);
-  socket_connect($sock, $host, $port);
-  $db = new SQLite3('database.db');
-  $editRa;
-  $editCodDisciplina;
+  $host = "127.0.0.1";  //localhost
+  $port = 20205;  //porta de conexão
+  $sock = socket_create(AF_INET, SOCK_STREAM, 0); //cria o socket
+  socket_connect($sock, $host, $port);  //conecta o socket
+  $db = new SQLite3('database.db'); //cria a conexão com o banco de dados
+  $editRa;  
+  $editCodDisciplina; 
   $resultArray = array();
-  $matricula = new Matricula();
-  $resultArrayDisciplinas= array();
-  $crudMatricula = new CrudMatricula();
+  $matricula = new Matricula(); //cria a matricula
+  $resultArrayDisciplinas= array(); //cria o array de disciplinas
+  $crudMatricula = new CrudMatricula(); //cria o crud de matricula
   ?>
 <div style="display: flex; width: 100%; margin-top: 30px; ">
   <section style=" width: 50%; height:100%">
     <div id="myModal" class="modal modalMatricula">
       <div class="modal-content">
-        <span class="close" onclick="fecharModalMatricula()">&times;</span>
+        <span class="close" onclick="fecharModalMatricula()">&times;</span> <!-- fecha o modal -->
         <form method="post">
           <div style="justify-content: space-between; display:flex; flex-direction: column; height: 250px;">
             <h1>Inserir Matricula</h1>
@@ -41,18 +41,18 @@ use App\Proto\Matricula;
           </div>
         </form>
         <?php
-        if (isset($_POST['submit'])) {
-          $matricula->setRA($_POST['ra']);
-          $matricula->setSemestre($_POST['semestre']);
-          $matricula->setCodDisciplina($_POST['cod_disciplina']);
-          $matricula->setAno($_POST['ano']);
-          $crudMatricula->setMatricula($matricula);
-          $crudMatricula->setType(1);
-          $matricula_string = $crudMatricula->serializeToJsonString();
-          $len = strlen($matricula_string);
-          socket_write($sock, $matricula_string, $len);
-          $serv = socket_read($sock, 1024);
-          echo "Server: \t" . trim($serv);
+        if (isset($_POST['submit'])) {  //se o submit for clicado
+          $matricula->setRA($_POST['ra']);  //seta o ra
+          $matricula->setSemestre($_POST['semestre']);  //seta o semestre
+          $matricula->setCodDisciplina($_POST['cod_disciplina']); //seta o codigo da disciplina
+          $matricula->setAno($_POST['ano']);  //seta o ano
+          $crudMatricula->setMatricula($matricula); //seta a matricula
+          $crudMatricula->setType(1); //seta o tipo de operação
+          $matricula_string = $crudMatricula->serializeToJsonString();  //serializa a matricula
+          $len = strlen($matricula_string); //tamanho da string
+          socket_write($sock, $matricula_string, $len); //envia a string para o servidor
+          $serv = socket_read($sock, 1024); //recebe a string do servidor
+          echo "Server: \t" . trim($serv);  //imprime o servidor
         }
         ?>
       </div>
@@ -69,19 +69,19 @@ use App\Proto\Matricula;
           </div>
         </form>
         <?php
-        if (isset($_POST['submit2'])) {
-          $matricula->setAno($_POST['ano']);
-          $matricula->setSemestre($_POST['semestre']);
-          $crudMatricula->setMatricula($matricula);
-          $crudMatricula->setType(5);
-          $matricula_string = $crudMatricula->serializeToJsonString();
-          $len = strlen($matricula_string);
-          socket_write($sock, $matricula_string, $len);
-          $serv = socket_read($sock, 1024);
-          $resultArrayDisciplinas  = json_decode($serv, true);
-          $matricula->setAno(0);
-          $matricula->setSemestre(0);
-          $matricula->setRA(0);
+        if (isset($_POST['submit2'])) { //se o submit for clicado
+          $matricula->setAno($_POST['ano']);  //seta o ano
+          $matricula->setSemestre($_POST['semestre']);  //seta o semestre
+          $crudMatricula->setMatricula($matricula); //seta a matricula
+          $crudMatricula->setType(5); //seta o tipo de operação
+          $matricula_string = $crudMatricula->serializeToJsonString();  //serializa a matricula
+          $len = strlen($matricula_string); //tamanho da string
+          socket_write($sock, $matricula_string, $len); //envia a string para o servidor
+          $serv = socket_read($sock, 1024); //recebe a string do servidor
+          $resultArrayDisciplinas  = json_decode($serv, true);  //decodifica a string
+          $matricula->setAno(0);  //seta o ano
+          $matricula->setSemestre(0); //seta o semestre
+          $matricula->setRA(0); //seta o ra
         }
         ?>
       </div>
@@ -99,19 +99,19 @@ use App\Proto\Matricula;
           </div>
         </form>
         <?php
-        if (isset($_POST['submitEditNota'])) {
-          $matricula->setNota($_POST['nota']);
-          $matricula->setRA($_POST['ra']);
-          $matricula->setCodDisciplina($_POST['cod_disciplina']);
-          $crudMatricula->setMatricula($matricula);
-          $crudMatricula->setType(2);
-          $matricula_string = $crudMatricula->serializeToJsonString();
-          $len = strlen($matricula_string);
-          socket_write($sock, $matricula_string, $len);
-          $serv = socket_read($sock, 1024);
-          echo "Server: \t" . trim($serv);
-          $matricula->setRA(0);
-          $matricula->setCodDisciplina(0);
+        if (isset($_POST['submitEditNota'])) {  //se o submit for clicado
+          $matricula->setNota($_POST['nota']);      //seta a nota
+          $matricula->setRA($_POST['ra']);  //seta o ra
+          $matricula->setCodDisciplina($_POST['cod_disciplina']); //seta o codigo da disciplina
+          $crudMatricula->setMatricula($matricula); //seta a matricula
+          $crudMatricula->setType(2); //seta o tipo de operação 
+          $matricula_string = $crudMatricula->serializeToJsonString();  //serializa a matricula
+          $len = strlen($matricula_string); //tamanho da string
+          socket_write($sock, $matricula_string, $len); //envia a string para o servidor  
+          $serv = socket_read($sock, 1024); //recebe a string do servidor
+          echo "Server: \t" . trim($serv);  //imprime o servidor
+          $matricula->setRA(0); //seta o ra
+          $matricula->setCodDisciplina(0);  //seta o codigo da disciplina
         }
         ?>
       </div>
@@ -129,17 +129,17 @@ use App\Proto\Matricula;
           </div>
         </form>
         <?php
-        if (isset($_POST['submitEditFalta'])) {
-          $matricula->setFaltas($_POST['faltas']);
-          $matricula->setRA($_POST['ra']);
-          $matricula->setCodDisciplina($_POST['cod_disciplina']);
-          $crudMatricula->setMatricula($matricula);
-          $crudMatricula->setType(3);
-          $matricula_string = $crudMatricula->serializeToJsonString();
-          $len = strlen($matricula_string);
-          socket_write($sock, $matricula_string, $len);
-          $serv = socket_read($sock, 1024);
-          echo "Server: \t" . trim($serv);
+        if (isset($_POST['submitEditFalta'])) { 
+          $matricula->setFaltas($_POST['faltas']);    //seta as faltas
+          $matricula->setRA($_POST['ra']);  //seta o ra
+          $matricula->setCodDisciplina($_POST['cod_disciplina']); //seta o codigo da disciplina
+          $crudMatricula->setMatricula($matricula); //seta a matricula
+          $crudMatricula->setType(3); //seta o tipo
+          $matricula_string = $crudMatricula->serializeToJsonString();  //serializa a matricula
+          $len = strlen($matricula_string); //tamanho da string
+          socket_write($sock, $matricula_string, $len); //envia a string para o servidor
+          $serv = socket_read($sock, 1024); //recebe a string do servidor
+          echo "Server: \t" . trim($serv);  //imprime o servidor
           $matricula->setRA(0);
           $matricula->setCodDisciplina(0);
         }
@@ -159,20 +159,20 @@ use App\Proto\Matricula;
           </div>
         </form>
         <?php
-        if (isset($_POST['submitListaAlunos'])) {
-          $matricula->setCodDisciplina($_POST['cod_disciplina']);
-          $matricula->setAno($_POST['ano']);
-          $matricula->setSemestre($_POST['semestre']);
-          $crudMatricula->setMatricula($matricula);
-          $crudMatricula->setType(4);
-          $matricula_string = $crudMatricula->serializeToJsonString();
-          $len = strlen($matricula_string);
-          socket_write($sock, $matricula_string, $len);
-          $serv = socket_read($sock, 1024);
-          @$resultArray  = json_decode($serv, true);
-          $matricula->setAno(0);
-          $matricula->setSemestre(0);
-          $matricula->setCodDisciplina(0);
+        if (isset($_POST['submitListaAlunos'])) { //se o submit for clicado
+          $matricula->setCodDisciplina($_POST['cod_disciplina']); //seta o codigo da disciplina
+          $matricula->setAno($_POST['ano']);  //seta o ano
+          $matricula->setSemestre($_POST['semestre']);  //seta o semestre
+          $crudMatricula->setMatricula($matricula); //seta a matricula
+          $crudMatricula->setType(4); //seta o tipo
+          $matricula_string = $crudMatricula->serializeToJsonString();  //serializa a matricula 
+          $len = strlen($matricula_string); //tamanho da string
+          socket_write($sock, $matricula_string, $len); //envia a string para o servidor
+          $serv = socket_read($sock, 1024); //recebe a string do servidor
+          @$resultArray  = json_decode($serv, true);  //decodifica a string
+          $matricula->setAno(0);  //seta o ano
+          $matricula->setSemestre(0); //seta o semestre
+          $matricula->setCodDisciplina(0);  //seta o codigo da disciplina
         }
         ?>
       </div>
@@ -204,9 +204,9 @@ use App\Proto\Matricula;
 
               <li class="topic"><a href="#">RA</a></li>
               <?php
-               if ($resultArray) {
-              foreach ($resultArray as $key => $row) {
-                echo '<li ><a href="#">' . $row['RA'] . '</li>';
+               if ($resultArray) {  //se o resultado for diferente de vazio
+              foreach ($resultArray as $key => $row) {  //percorre o array
+                echo '<li ><a href="#">' . $row['RA'] . '</li>';  //imprime o ra
               }
             }
               ?>
@@ -215,8 +215,8 @@ use App\Proto\Matricula;
               <li class="topic"><a href="#">Nome</a></li>
               <?php
                if ($resultArray) {
-               foreach ($resultArray as $key => $row) {
-                echo '<li ><a href="#">' . $row['nome'] . '</li>';
+               foreach ($resultArray as $key => $row) { //percorre o array
+                echo '<li ><a href="#">' . $row['nome'] . '</li>';  //imprime o nome
               }
               }
               ?>
@@ -226,8 +226,8 @@ use App\Proto\Matricula;
               <li class="topic"><a href="#">Periodo</a></li>
               <?php
               if ($resultArray) {
-               foreach ($resultArray as $key => $row) {
-                echo '<li ><a href="#">' . $row['periodo'] . '</a></li>';
+               foreach ($resultArray as $key => $row) { //percorre o array
+                echo '<li ><a href="#">' . $row['periodo'] . '</a></li>'; //imprime o periodo
               }
             }
               ?>
@@ -236,8 +236,8 @@ use App\Proto\Matricula;
               <li class="topic">Editar nota</li>
               <?php
                 if ($resultArray) {
-               foreach ($resultArray as $key => $row) {
-                echo '<li><button id='. $row['RA'] . ',' . $row['codDisciplina'] .' onclick="javascript:abrirModalEditNotas(this.id)">Editar</button></li>';
+               foreach ($resultArray as $key => $row) { //percorre o array
+                echo '<li><button id='. $row['RA'] . ',' . $row['codDisciplina'] .' onclick="javascript:abrirModalEditNotas(this.id)">Editar</button></li>';  //imprime o periodo
               }
             }
               ?>
@@ -246,8 +246,8 @@ use App\Proto\Matricula;
               <li class="topic">Editar faltas</li>
               <?php
                 if ($resultArray) {
-               foreach ($resultArray as $key => $row) {
-                echo '<li><button id='. $row['RA'] . ',' . $row['codDisciplina'] .' onclick="javascript:abrirModalEditFaltas(this.id)">Editar</button></li>';
+               foreach ($resultArray as $key => $row) { //percorre o array
+                echo '<li><button id='. $row['RA'] . ',' . $row['codDisciplina'] .' onclick="javascript:abrirModalEditFaltas(this.id)">Editar</button></li>'; //imprime o periodo
               }
             }
               ?>
@@ -280,32 +280,32 @@ use App\Proto\Matricula;
             <ul class="details">
               <li class="topic">RA</li>
               <?php
-              foreach ($resultArrayDisciplinas as $key => $row) {
-                echo '<li ><a href="#">' . $row['RA'] . '</li>';
+              foreach ($resultArrayDisciplinas as $key => $row) { //percorre o array
+                echo '<li ><a href="#">' . $row['RA'] . '</li>';    //imprime o ra
               }
               ?>
             </ul>
             <ul class="details">
               <li class="topic"><a href="#">Nome</a></li>
               <?php
-              foreach ($resultArrayDisciplinas as $key => $row) {
-                echo '<li ><a href="#">' . $row['nome'] . '</a></li>';
-              }
+              foreach ($resultArrayDisciplinas as $key => $row) { //percorre o array
+                echo '<li ><a href="#">' . $row['nome'] . '</a></li>';  //imprime o nome
+              } 
               ?>
             </ul>
             <ul class="details">
               <li class="topic">Nota</li>
               <?php
-              foreach ($resultArrayDisciplinas as $key => $row) {
-                echo '<li ><a href="#">' . $row['nota'] . '</a></li>';
+              foreach ($resultArrayDisciplinas as $key => $row) { //percorre o array
+                echo '<li ><a href="#">' . $row['nota'] . '</a></li>';  //imprime o nome
               }
               ?>
             </ul>
             <ul class="details">
               <li class="topic">Faltas</li>
               <?php
-              foreach ($resultArrayDisciplinas as $key => $row) {
-                echo '<li ><a href="#">' . $row['faltas'] . '</a></li>';
+              foreach ($resultArrayDisciplinas as $key => $row) { //percorre o array
+                echo '<li ><a href="#">' . $row['faltas'] . '</a></li>';  //imprime o nome
               }
               ?>
             </ul>
@@ -317,14 +317,14 @@ use App\Proto\Matricula;
 </div>
 
   <script>
-    let modalMatricula = document.querySelector(".modalMatricula");
-    let modalAluno = document.querySelector(".modalAluno");
-    let modalNota = document.querySelector(".modalEditNotas");
-    let modalFalta = document.querySelector(".modalEditFaltas");
-    let modalListarAlunos = document.querySelector(".modalListarAlunos");
+    let modalMatricula = document.querySelector(".modalMatricula"); //seleciona o modal
+    let modalAluno = document.querySelector(".modalAluno"); //seleciona o modal
+    let modalNota = document.querySelector(".modalEditNotas");  //seleciona o modal
+    let modalFalta = document.querySelector(".modalEditFaltas");  //seleciona o modal
+    let modalListarAlunos = document.querySelector(".modalListarAlunos"); //seleciona o modal
  
     // Get the modal
-    function abrirModalMatricula() {
+    function abrirModalMatricula() {  //função para abrir o modal
       modalMatricula.style.display = "block";
     }
 
@@ -341,10 +341,10 @@ use App\Proto\Matricula;
     }
 
    
-    function abrirModalEditNotas(id) {
+    function abrirModalEditNotas(id) {  //função para abrir o modal
       console.log(id)
-      document.getElementById("raEditNota").value = id.split(",")[0];
-      document.getElementById("codDisciplinaEditNota").value = id.split(",")[1];
+      document.getElementById("raEditNota").value = id.split(",")[0]; //pega o ra
+      document.getElementById("codDisciplinaEditNota").value = id.split(",")[1];  //pega o codigo da disciplina
       modalNota.style.display = "block";
     }
 
@@ -353,8 +353,8 @@ use App\Proto\Matricula;
     }
 
     function abrirModalEditFaltas(id) {
-      document.getElementById("raEditFalta").value = id.split(",")[0];
-      document.getElementById("codDisciplinaEditFalta").value = id.split(",")[1];
+      document.getElementById("raEditFalta").value = id.split(",")[0];  //pega o ra
+      document.getElementById("codDisciplinaEditFalta").value = id.split(",")[1]; //pega o codigo da disciplina
       modalFalta.style.display = "block";
     }
 

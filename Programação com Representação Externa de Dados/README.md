@@ -23,7 +23,7 @@ http://localhost/RED/src/client.php
  Apos aberto, a pagina abaixo será aberta.
 
  ![janela para inserir ](./images/Screenshot_1.png)
-##
+## Os dados para a inserção estão disponiveis em src/database.db
 
 
 ## Inserção na tabela Matricula
