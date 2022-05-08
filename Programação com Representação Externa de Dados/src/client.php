@@ -1,3 +1,21 @@
+<!-- 
+    # Descrição: #Implementar um serviço de gerenciamento de notas de uma escola.
+    - Tabelas:
+      - Curso
+      - Disciplina   
+      - Aluno
+      - Matricula
+
+    - Funções:
+      - Inserir na tabela Matricula
+      - Alterar notas e faltas na tabela Matricula
+      - Listar alunos de uma disciplina informado a disciplina, o ano e o semestre
+      - Listar disciplinas, faltas e notas informado o ano e o semestre
+
+    # Autores: Caio Theodoro e Gustavo Kioshi
+    # Data de criação: 28/04/2022
+    # Data de modifica -->
+
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <?php
