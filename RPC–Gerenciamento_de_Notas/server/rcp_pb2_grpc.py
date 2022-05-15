@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import rcp_pb2 as rcp__pb2
+import rcp_pb2 as proto_dot_rcp__pb2
 
 
 class ServicesStub(object):
@@ -16,23 +16,28 @@ class ServicesStub(object):
         """
         self.InserirMatricula = channel.unary_unary(
                 '/Services/InserirMatricula',
-                request_serializer=rcp__pb2.Matricula.SerializeToString,
-                response_deserializer=rcp__pb2.CrudMatricula.FromString,
+                request_serializer=proto_dot_rcp__pb2.Matricula.SerializeToString,
+                response_deserializer=proto_dot_rcp__pb2.InserirMatriculaRes.FromString,
                 )
-        self.AlterarMatricula = channel.unary_unary(
-                '/Services/AlterarMatricula',
-                request_serializer=rcp__pb2.Matricula.SerializeToString,
-                response_deserializer=rcp__pb2.CrudMatricula.FromString,
+        self.AlterarNota = channel.unary_unary(
+                '/Services/AlterarNota',
+                request_serializer=proto_dot_rcp__pb2.AlterarNotaReq.SerializeToString,
+                response_deserializer=proto_dot_rcp__pb2.MessageRes.FromString,
+                )
+        self.AlterarFaltas = channel.unary_unary(
+                '/Services/AlterarFaltas',
+                request_serializer=proto_dot_rcp__pb2.AlterarFaltasReq.SerializeToString,
+                response_deserializer=proto_dot_rcp__pb2.MessageRes.FromString,
                 )
         self.ListarDisciplinas = channel.unary_unary(
                 '/Services/ListarDisciplinas',
-                request_serializer=rcp__pb2.Matricula.SerializeToString,
-                response_deserializer=rcp__pb2.CrudMatricula.FromString,
+                request_serializer=proto_dot_rcp__pb2.DisciplinasReq.SerializeToString,
+                response_deserializer=proto_dot_rcp__pb2.DisciplinasRes.FromString,
                 )
         self.ListarAlunos = channel.unary_unary(
                 '/Services/ListarAlunos',
-                request_serializer=rcp__pb2.AlunosReq.SerializeToString,
-                response_deserializer=rcp__pb2.AlunosRes.FromString,
+                request_serializer=proto_dot_rcp__pb2.AlunosReq.SerializeToString,
+                response_deserializer=proto_dot_rcp__pb2.AlunosRes.FromString,
                 )
 
 
@@ -45,7 +50,13 @@ class ServicesServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def AlterarMatricula(self, request, context):
+    def AlterarNota(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def AlterarFaltas(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -68,23 +79,28 @@ def add_ServicesServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'InserirMatricula': grpc.unary_unary_rpc_method_handler(
                     servicer.InserirMatricula,
-                    request_deserializer=rcp__pb2.Matricula.FromString,
-                    response_serializer=rcp__pb2.CrudMatricula.SerializeToString,
+                    request_deserializer=proto_dot_rcp__pb2.Matricula.FromString,
+                    response_serializer=proto_dot_rcp__pb2.InserirMatriculaRes.SerializeToString,
             ),
-            'AlterarMatricula': grpc.unary_unary_rpc_method_handler(
-                    servicer.AlterarMatricula,
-                    request_deserializer=rcp__pb2.Matricula.FromString,
-                    response_serializer=rcp__pb2.CrudMatricula.SerializeToString,
+            'AlterarNota': grpc.unary_unary_rpc_method_handler(
+                    servicer.AlterarNota,
+                    request_deserializer=proto_dot_rcp__pb2.AlterarNotaReq.FromString,
+                    response_serializer=proto_dot_rcp__pb2.MessageRes.SerializeToString,
+            ),
+            'AlterarFaltas': grpc.unary_unary_rpc_method_handler(
+                    servicer.AlterarFaltas,
+                    request_deserializer=proto_dot_rcp__pb2.AlterarFaltasReq.FromString,
+                    response_serializer=proto_dot_rcp__pb2.MessageRes.SerializeToString,
             ),
             'ListarDisciplinas': grpc.unary_unary_rpc_method_handler(
                     servicer.ListarDisciplinas,
-                    request_deserializer=rcp__pb2.Matricula.FromString,
-                    response_serializer=rcp__pb2.CrudMatricula.SerializeToString,
+                    request_deserializer=proto_dot_rcp__pb2.DisciplinasReq.FromString,
+                    response_serializer=proto_dot_rcp__pb2.DisciplinasRes.SerializeToString,
             ),
             'ListarAlunos': grpc.unary_unary_rpc_method_handler(
                     servicer.ListarAlunos,
-                    request_deserializer=rcp__pb2.AlunosReq.FromString,
-                    response_serializer=rcp__pb2.AlunosRes.SerializeToString,
+                    request_deserializer=proto_dot_rcp__pb2.AlunosReq.FromString,
+                    response_serializer=proto_dot_rcp__pb2.AlunosRes.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -108,13 +124,13 @@ class Services(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/Services/InserirMatricula',
-            rcp__pb2.Matricula.SerializeToString,
-            rcp__pb2.CrudMatricula.FromString,
+            proto_dot_rcp__pb2.Matricula.SerializeToString,
+            proto_dot_rcp__pb2.InserirMatriculaRes.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def AlterarMatricula(request,
+    def AlterarNota(request,
             target,
             options=(),
             channel_credentials=None,
@@ -124,9 +140,26 @@ class Services(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/Services/AlterarMatricula',
-            rcp__pb2.Matricula.SerializeToString,
-            rcp__pb2.CrudMatricula.FromString,
+        return grpc.experimental.unary_unary(request, target, '/Services/AlterarNota',
+            proto_dot_rcp__pb2.AlterarNotaReq.SerializeToString,
+            proto_dot_rcp__pb2.MessageRes.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def AlterarFaltas(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/Services/AlterarFaltas',
+            proto_dot_rcp__pb2.AlterarFaltasReq.SerializeToString,
+            proto_dot_rcp__pb2.MessageRes.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -142,8 +175,8 @@ class Services(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/Services/ListarDisciplinas',
-            rcp__pb2.Matricula.SerializeToString,
-            rcp__pb2.CrudMatricula.FromString,
+            proto_dot_rcp__pb2.DisciplinasReq.SerializeToString,
+            proto_dot_rcp__pb2.DisciplinasRes.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -159,7 +192,7 @@ class Services(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/Services/ListarAlunos',
-            rcp__pb2.AlunosReq.SerializeToString,
-            rcp__pb2.AlunosRes.FromString,
+            proto_dot_rcp__pb2.AlunosReq.SerializeToString,
+            proto_dot_rcp__pb2.AlunosRes.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
