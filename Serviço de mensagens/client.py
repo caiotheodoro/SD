@@ -24,11 +24,11 @@ class Client:
 
         self.channel.exchange_declare(exchange='direct_logs', exchange_type='direct')
         result = self.channel.queue_declare(queue='', exclusive=True)
-        queue_name = result.method.queue
+        qname = result.method.queue
         for topico in topicos:
-            self.channel.queue_bind(exchange='direct_logs', queue=queue_name, routing_key=topico)
+            self.channel.queue_bind(exchange='direct_logs', queue=qname, routing_key=topico)
         
-        return queue_name
+        return qname
 
     def callback(self, ch, method, properties, body):
         data = body.decode()
@@ -39,8 +39,8 @@ class Client:
         
         topicos = self.validate_search()
         if topicos:
-            queue_name = self.rabbit_config(topicos)
-            self.channel.basic_consume(queue=queue_name, on_message_callback=self.callback, auto_ack=True)
+            qname = self.rabbit_config(topicos)
+            self.channel.basic_consume(queue=qname, on_message_callback=self.callback, auto_ack=True)
             self.channel.start_consuming()
 
 
