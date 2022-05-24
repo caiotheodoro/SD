@@ -4,6 +4,7 @@ import tweepy
 import os
 
 
+
 class Collector:
     def __init__(self):
 
@@ -16,7 +17,8 @@ class Collector:
 
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
         self.channel = self.connection.channel()
-        
+
+
     def instanceApi(self):
         instance = tweepy.OAuthHandler(self.consumer_key, self.consumer_secret)
         instance.set_access_token(self.access_token, self.access_token_secret)
@@ -34,18 +36,17 @@ class Collector:
             query += queue
             if queue != queues[-1]:
                 query += ' OR '
-        
-        tweets = api.search_tweets(q=query, result_type='recent', count=50)
-      
+
+        tweets = api.search_tweets(q=query,result_type='mixed',count=20)
+
         for tweet in tweets:
             content = tweet.user.name + " - " + tweet.text + "\n"
-            self.channel.queue_declare(queue=queue)
-            self.channel.basic_publish(exchange='', routing_key=queue, body=content)
-            print("Mensagem enviada para a fila: " + queue)
+            self.channel.exchange_declare(exchange='tweets', exchange_type='direct')
+            self.channel.basic_publish(exchange='', routing_key='tweets', body=content)
         self.connection.close()
 
 if __name__ == '__main__':
     try:
-        Collector().run()
+        Collector.run(Collector())
     except KeyboardInterrupt:
         print("Encerrado")

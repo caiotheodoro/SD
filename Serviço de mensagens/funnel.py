@@ -1,7 +1,6 @@
 
 import pika
 
-
 class Funnel:
     def __init__(self, host='localhost'):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=host))
@@ -34,6 +33,6 @@ class Funnel:
 
 if __name__ == '__main__':
     try:
-        Funnel().main()
+        Funnel.main(Funnel())
     except KeyboardInterrupt:
         print("Encerrado")
