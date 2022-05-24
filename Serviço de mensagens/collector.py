@@ -1,3 +1,21 @@
+'''
+    #    Descrição: Implementar um serviço de notificação de tweets de um determinado tópico
+
+    - Tópicos possíveis estão em queues.txt
+    - O serviço foiimplementado com RabbitMQ
+    - Deve-se passar as credenciais de acesso ao Twitter no arquivo secret, como:
+        - consumer_key
+        - consumer_secret
+        - access_token
+        - access_token_secret
+
+    respectivamente.
+
+    # Autores: Caio Theodoro e Gustavo Kioshi
+    # Data de criação: 17/05/2022
+    # Data de modificação: 23/05/2022
+'''
+
 
 import pika
 import tweepy
